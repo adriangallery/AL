@@ -38,6 +38,17 @@ function initializeApp() {
     // Configure music
     backgroundMusic.volume = 0.3;
     
+    // Try to start music immediately without user interaction
+    setTimeout(() => {
+        if (!musicInitialized) {
+            musicInitialized = true;
+            backgroundMusic.load();
+            if (!isMuted) {
+                backgroundMusic.play().catch(e => console.log('Audio autoplay blocked, will start on first click'));
+            }
+        }
+    }, 1000);
+    
     // Don't initialize ethers here - will load when needed
     console.log('App initialized - ethers will load when needed');
 }
@@ -76,12 +87,12 @@ function startIntro() {
         introImage.style.opacity = '1';
     }, 100);
     
-    // 6 second timer for auto-transition (reduced from 10)
+    // 2 second timer for auto-transition (reduced from 6)
     introTimer = setTimeout(() => {
         if (introScreen.classList.contains('active')) {
             handleIntroClick();
         }
-    }, 6000);
+    }, 2000);
 }
 
 function handleIntroClick(event) {
@@ -93,7 +104,7 @@ function handleIntroClick(event) {
     console.log('Intro click detected');
     clearTimeout(introTimer);
     
-    // Initialize and start music on first click
+    // Initialize and start music if not already started
     if (!musicInitialized) {
         musicInitialized = true;
         backgroundMusic.load();
@@ -108,9 +119,9 @@ function handleIntroClick(event) {
 function goToMainScreen() {
     console.log('Starting transition to main screen');
     
-    // Fade out intro (4 seconds - reduced from 8)
+    // Fade out intro (5 seconds - changed from 4)
     introScreen.style.opacity = '0';
-    introScreen.style.transition = 'opacity 4s ease-in-out';
+    introScreen.style.transition = 'opacity 5s ease-in-out';
     
     setTimeout(() => {
         introScreen.classList.remove('active');
@@ -130,7 +141,7 @@ function goToMainScreen() {
                 loadEthersWhenNeeded();
             }
         }, 100);
-    }, 4000);
+    }, 5000);
 }
 
 async function loadEthersWhenNeeded() {
@@ -383,10 +394,10 @@ function showNotification(message, type = 'info') {
     notification.className = `notification ${type}`;
     notification.textContent = message;
     
-    // Notification styles
+    // Notification styles - moved to bottom
     notification.style.cssText = `
         position: fixed;
-        top: 20px;
+        bottom: 20px;
         right: 20px;
         background: #000;
         color: ${type === 'error' ? '#ff0000' : type === 'success' ? '#00ff00' : type === 'warning' ? '#ffff00' : '#00ff00'};
