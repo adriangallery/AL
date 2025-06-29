@@ -1,16 +1,17 @@
-// Configuración de la red BASE
-const BASE_CHAIN_ID = '0x2105'; // 8453 en decimal
+// BASE Network configuration
+const BASE_CHAIN_ID = '0x2105'; // 8453 in decimal
 const BASE_RPC_URL = 'https://mainnet.base.org';
 const BASE_EXPLORER = 'https://basescan.org';
 
-// Variables globales
+// Global variables
 let provider;
 let signer;
 let isWalletConnected = false;
 let isMuted = false;
 let introTimer;
+let musicInitialized = false;
 
-// Elementos del DOM
+// DOM elements
 const introScreen = document.getElementById('intro-screen');
 const mainScreen = document.getElementById('main-screen');
 const floppyScreen = document.getElementById('floppy-screen');
@@ -25,7 +26,7 @@ const mintButton = document.getElementById('mint-button');
 const buyFloppyBtn = document.getElementById('buy-floppy');
 const backToMainBtn = document.getElementById('back-to-main');
 
-// Inicialización
+// Initialization
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
     setupEventListeners();
@@ -33,15 +34,28 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
-    // Configurar música
+    // Configure music
     backgroundMusic.volume = 0.3;
     
-    // Verificar si MetaMask está instalado
+    // Initialize music after user interaction
+    document.addEventListener('click', function initMusic() {
+        if (!musicInitialized) {
+            musicInitialized = true;
+            backgroundMusic.load();
+            document.removeEventListener('click', initMusic);
+        }
+    }, { once: true });
+    
+    // Check if MetaMask is installed
     if (typeof window.ethereum !== 'undefined') {
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        checkWalletConnection();
+        try {
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            checkWalletConnection();
+        } catch (error) {
+            console.warn('Ethers.js not available:', error);
+        }
     } else {
-        showNotification('MetaMask no está instalado', 'error');
+        showNotification('MetaMask is not installed', 'error');
     }
 }
 
@@ -49,13 +63,13 @@ function setupEventListeners() {
     // Intro screen
     introScreen.addEventListener('click', handleIntroClick);
     
-    // Música
+    // Music
     muteButton.addEventListener('click', toggleMute);
     
     // Wallet
     connectWalletBtn.addEventListener('click', connectWallet);
     
-    // Navegación
+    // Navigation
     clickArea.addEventListener('click', handleBasementClick);
     closePopupBtn.addEventListener('click', closeMintPopup);
     mintButton.addEventListener('click', handleMint);
@@ -70,7 +84,7 @@ function setupEventListeners() {
 }
 
 function startIntro() {
-    // Fade in de la imagen de intro
+    // Fade in intro image
     introImage.style.opacity = '0';
     introImage.style.transition = 'opacity 2s ease-in-out';
     
@@ -78,7 +92,7 @@ function startIntro() {
         introImage.style.opacity = '1';
     }, 100);
     
-    // Timer de 10 segundos para auto-transición
+    // 10 second timer for auto-transition
     introTimer = setTimeout(() => {
         if (introScreen.classList.contains('active')) {
             goToMainScreen();
@@ -105,8 +119,8 @@ function goToMainScreen() {
             mainScreen.classList.add('active');
             mainScreen.style.opacity = '1';
             
-            // Iniciar música
-            if (!isMuted) {
+            // Start music after user interaction
+            if (!isMuted && musicInitialized) {
                 backgroundMusic.play().catch(e => console.log('Audio autoplay blocked'));
             }
         }, 100);
@@ -152,19 +166,21 @@ function toggleMute() {
         backgroundMusic.pause();
         muteButton.textContent = '🔇';
     } else {
-        backgroundMusic.play().catch(e => console.log('Audio play failed'));
+        if (musicInitialized) {
+            backgroundMusic.play().catch(e => console.log('Audio play failed'));
+        }
         muteButton.textContent = '🔊';
     }
 }
 
 async function connectWallet() {
     if (!window.ethereum) {
-        showNotification('MetaMask no está instalado', 'error');
+        showNotification('MetaMask is not installed', 'error');
         return;
     }
     
     try {
-        // Solicitar conexión de cuenta
+        // Request account connection
         const accounts = await window.ethereum.request({
             method: 'eth_requestAccounts'
         });
@@ -173,11 +189,11 @@ async function connectWallet() {
             await checkAndSwitchNetwork();
             isWalletConnected = true;
             updateWalletUI();
-            showNotification('Wallet conectada exitosamente', 'success');
+            showNotification('Wallet connected successfully', 'success');
         }
     } catch (error) {
-        console.error('Error conectando wallet:', error);
-        showNotification('Error al conectar wallet', 'error');
+        console.error('Error connecting wallet:', error);
+        showNotification('Error connecting wallet', 'error');
     }
 }
 
@@ -191,7 +207,7 @@ async function checkAndSwitchNetwork() {
                 params: [{ chainId: BASE_CHAIN_ID }]
             });
         } catch (switchError) {
-            // Si la red no existe, agregarla
+            // If network doesn't exist, add it
             if (switchError.code === 4902) {
                 try {
                     await window.ethereum.request({
@@ -209,10 +225,10 @@ async function checkAndSwitchNetwork() {
                         }]
                     });
                 } catch (addError) {
-                    showNotification('Error al agregar red Base', 'error');
+                    showNotification('Error adding Base network', 'error');
                 }
             } else {
-                showNotification('Error al cambiar a red Base', 'error');
+                showNotification('Error switching to Base network', 'error');
             }
         }
     }
@@ -240,11 +256,11 @@ function updateWalletUI() {
 
 function handleBasementClick(event) {
     if (!isWalletConnected) {
-        showNotification('Conecta tu wallet primero', 'warning');
+        showNotification('Connect your wallet first', 'warning');
         return;
     }
     
-    // Mostrar popup de mint
+    // Show mint popup
     mintPopup.classList.add('active');
 }
 
@@ -254,43 +270,52 @@ function closeMintPopup() {
 
 async function handleMint() {
     if (!isWalletConnected) {
-        showNotification('Conecta tu wallet primero', 'warning');
+        showNotification('Connect your wallet first', 'warning');
         return;
     }
     
     try {
-        showNotification('Funcionalidad de mint en desarrollo...', 'info');
+        showNotification('Mint functionality in development...', 'info');
         closeMintPopup();
-        // Aquí iría la lógica de mint con el contrato
+        // Here would go the mint logic with the contract
     } catch (error) {
-        console.error('Error en mint:', error);
-        showNotification('Error en el proceso de mint', 'error');
+        console.error('Error in mint:', error);
+        showNotification('Error in mint process', 'error');
     }
 }
 
 async function handleBuyFloppy() {
     if (!isWalletConnected) {
-        showNotification('Conecta tu wallet primero', 'warning');
+        showNotification('Connect your wallet first', 'warning');
         return;
     }
     
     try {
+        if (!window.ethers || !window.ethers.utils) {
+            showNotification('Ethers.js not loaded properly', 'error');
+            return;
+        }
+        
         const price = ethers.utils.parseEther('0.01');
+        
+        if (!signer) {
+            signer = provider.getSigner();
+        }
         
         const tx = await signer.sendTransaction({
             to: '0x7E99075Ce287F1cF8cBCAaa6A1C7894e404fD7Ea', // Adrian Token address
             value: price
         });
         
-        showNotification('Transacción enviada: ' + tx.hash, 'success');
+        showNotification('Transaction sent: ' + tx.hash, 'success');
         
-        // Esperar confirmación
+        // Wait for confirmation
         await tx.wait();
-        showNotification('Floppy comprado exitosamente!', 'success');
+        showNotification('Floppy purchased successfully!', 'success');
         
     } catch (error) {
-        console.error('Error comprando floppy:', error);
-        showNotification('Error en la compra', 'error');
+        console.error('Error buying floppy:', error);
+        showNotification('Error in purchase', 'error');
     }
 }
 
@@ -298,7 +323,7 @@ function handleAccountsChanged(accounts) {
     if (accounts.length === 0) {
         isWalletConnected = false;
         updateWalletUI();
-        showNotification('Wallet desconectada', 'warning');
+        showNotification('Wallet disconnected', 'warning');
     } else {
         checkWalletConnection();
     }
@@ -306,17 +331,17 @@ function handleAccountsChanged(accounts) {
 
 function handleChainChanged(chainId) {
     if (chainId !== BASE_CHAIN_ID) {
-        showNotification('Cambia a la red Base', 'warning');
+        showNotification('Switch to Base network', 'warning');
     }
 }
 
 function showNotification(message, type = 'info') {
-    // Crear notificación
+    // Create notification
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
     
-    // Estilos de la notificación
+    // Notification styles
     notification.style.cssText = `
         position: fixed;
         top: 20px;
@@ -335,20 +360,22 @@ function showNotification(message, type = 'info') {
     
     document.body.appendChild(notification);
     
-    // Remover después de 5 segundos
+    // Remove after 5 seconds
     setTimeout(() => {
         notification.style.opacity = '0';
         notification.style.transition = 'opacity 1s ease-out';
         setTimeout(() => {
-            document.body.removeChild(notification);
+            if (document.body.contains(notification)) {
+                document.body.removeChild(notification);
+            }
         }, 1000);
     }, 5000);
 }
 
-// Prevenir contexto del menú derecho
+// Prevent right-click context menu
 document.addEventListener('contextmenu', e => e.preventDefault());
 
-// Prevenir zoom en móviles
+// Prevent zoom on mobile
 document.addEventListener('gesturestart', e => e.preventDefault());
 document.addEventListener('gesturechange', e => e.preventDefault());
 document.addEventListener('gestureend', e => e.preventDefault()); 

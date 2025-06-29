@@ -1,42 +1,43 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdrianLAB - Retro Adventure</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="app">
-        <!-- Pantalla de intro -->
+        <!-- Intro screen -->
         <div id="intro-screen" class="screen active">
             <img src="intro.png" alt="AdrianLAB Intro" id="intro-image">
             <div class="intro-overlay">
                 <h1 class="retro-title">AdrianLAB</h1>
-                <p class="retro-subtitle">Click para continuar...</p>
+                <p class="retro-subtitle">Click to continue...</p>
             </div>
         </div>
 
-        <!-- Pantalla principal -->
+        <!-- Main screen -->
         <div id="main-screen" class="screen">
             <div class="background-container">
                 <img src="basement.png" alt="Basement" id="basement-bg">
             </div>
             
-            <!-- Header con wallet -->
+            <!-- Header with wallet -->
             <header class="retro-header">
                 <div class="logo">AdrianLAB</div>
                 <button id="connect-wallet" class="retro-button">Connect Wallet</button>
                 <button id="mute-button" class="retro-button small">🔊</button>
             </header>
 
-            <!-- Área principal clickeable -->
+            <!-- Main clickable area -->
             <div id="click-area" class="click-area">
                 <div class="pixel-cursor"></div>
             </div>
 
-            <!-- Popup de mint -->
+            <!-- Mint popup -->
             <div id="mint-popup" class="popup">
                 <div class="popup-content">
                     <div class="popup-header">
@@ -44,7 +45,7 @@
                         <button id="close-popup" class="close-btn">×</button>
                     </div>
                     <div class="popup-body">
-                        <p>¿Quieres mintear tu NFT?</p>
+                        <p>Do you want to mint your NFT?</p>
                         <button id="mint-button" class="retro-button">Mint Now</button>
                     </div>
                 </div>
@@ -56,27 +57,57 @@
             </footer>
         </div>
 
-        <!-- Pantalla de compra de Floppy -->
+        <!-- Floppy purchase screen -->
         <div id="floppy-screen" class="screen">
             <div class="floppy-container">
                 <h1 class="retro-title">Floppy Purchase</h1>
                 <div class="floppy-item">
                     <div class="floppy-disk"></div>
                     <h3>Retro Floppy Disk</h3>
-                    <p>Precio: 0.01 ETH</p>
-                    <button id="buy-floppy" class="retro-button">Comprar Floppy</button>
+                    <p>Price: 0.01 ETH</p>
+                    <button id="buy-floppy" class="retro-button">Buy Floppy</button>
                 </div>
-                <button id="back-to-main" class="retro-button">Volver</button>
+                <button id="back-to-main" class="retro-button">Back</button>
             </div>
         </div>
     </div>
 
     <!-- Audio -->
-    <audio id="background-music" loop>
+    <audio id="background-music" loop preload="auto">
         <source src="Retro Adventure.mp3" type="audio/mpeg">
     </audio>
 
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <!-- Load ethers.js with fallback -->
+    <script>
+        // Fallback function if ethers fails to load
+        window.ethersFallback = function() {
+            console.warn('Ethers.js failed to load, using fallback');
+            window.ethers = {
+                providers: {
+                    Web3Provider: function() {
+                        return {
+                            getSigner: function() {
+                                return {
+                                    sendTransaction: function() {
+                                        return Promise.reject(new Error('Ethers.js not loaded'));
+                                    }
+                                };
+                            }
+                        };
+                    }
+                },
+                utils: {
+                    parseEther: function() {
+                        return '0';
+                    }
+                }
+            };
+        };
+    </script>
+    
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" 
+            onerror="ethersFallback()"></script>
+    
     <script src="app.js"></script>
 </body>
 </html> 
