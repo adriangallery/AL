@@ -77,36 +77,24 @@
         <source src="Retro Adventure.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Load ethers.js with fallback -->
+    <!-- Load ethers.js only when needed -->
     <script>
-        // Fallback function if ethers fails to load
-        window.ethersFallback = function() {
-            console.warn('Ethers.js failed to load, using fallback');
-            window.ethers = {
-                providers: {
-                    Web3Provider: function() {
-                        return {
-                            getSigner: function() {
-                                return {
-                                    sendTransaction: function() {
-                                        return Promise.reject(new Error('Ethers.js not loaded'));
-                                    }
-                                };
-                            }
-                        };
-                    }
-                },
-                utils: {
-                    parseEther: function() {
-                        return '0';
-                    }
+        // Function to load ethers.js dynamically
+        window.loadEthers = function() {
+            return new Promise((resolve, reject) => {
+                if (window.ethers) {
+                    resolve(window.ethers);
+                    return;
                 }
-            };
+                
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js';
+                script.onload = () => resolve(window.ethers);
+                script.onerror = () => reject(new Error('Failed to load ethers.js'));
+                document.head.appendChild(script);
+            });
         };
     </script>
-    
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" 
-            onerror="ethersFallback()"></script>
     
     <script src="app.js"></script>
 </body>

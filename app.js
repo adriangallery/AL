@@ -10,6 +10,7 @@ let isWalletConnected = false;
 let isMuted = false;
 let introTimer;
 let musicInitialized = false;
+let ethersLoaded = false;
 
 // DOM elements
 const introScreen = document.getElementById('intro-screen');
@@ -37,31 +38,14 @@ function initializeApp() {
     // Configure music
     backgroundMusic.volume = 0.3;
     
-    // Initialize music after user interaction
-    document.addEventListener('click', function initMusic() {
-        if (!musicInitialized) {
-            musicInitialized = true;
-            backgroundMusic.load();
-            document.removeEventListener('click', initMusic);
-        }
-    }, { once: true });
-    
-    // Check if MetaMask is installed
-    if (typeof window.ethereum !== 'undefined') {
-        try {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            checkWalletConnection();
-        } catch (error) {
-            console.warn('Ethers.js not available:', error);
-        }
-    } else {
-        showNotification('MetaMask is not installed', 'error');
-    }
+    // Don't initialize ethers here - will load when needed
+    console.log('App initialized - ethers will load when needed');
 }
 
 function setupEventListeners() {
-    // Intro screen
-    introScreen.addEventListener('click', handleIntroClick);
+    // Intro screen - use both click and touch events
+    introScreen.addEventListener('click', handleIntroClick, true);
+    introScreen.addEventListener('touchstart', handleIntroClick, true);
     
     // Music
     muteButton.addEventListener('click', toggleMute);
@@ -95,12 +79,18 @@ function startIntro() {
     // 10 second timer for auto-transition
     introTimer = setTimeout(() => {
         if (introScreen.classList.contains('active')) {
-            goToMainScreen();
+            handleIntroClick();
         }
     }, 10000);
 }
 
-function handleIntroClick() {
+function handleIntroClick(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    console.log('Intro click detected');
     clearTimeout(introTimer);
     
     // Initialize and start music on first click
@@ -108,7 +98,7 @@ function handleIntroClick() {
         musicInitialized = true;
         backgroundMusic.load();
         if (!isMuted) {
-            backgroundMusic.play().catch(e => console.log('Audio play failed'));
+            backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
         }
     }
     
@@ -116,6 +106,8 @@ function handleIntroClick() {
 }
 
 function goToMainScreen() {
+    console.log('Starting transition to main screen');
+    
     // Fade out intro (8 seconds)
     introScreen.style.opacity = '0';
     introScreen.style.transition = 'opacity 8s ease-in-out';
@@ -132,18 +124,48 @@ function goToMainScreen() {
         setTimeout(() => {
             mainScreen.classList.add('active');
             mainScreen.style.opacity = '1';
+            
+            // Load ethers.js when entering main screen
+            if (!ethersLoaded) {
+                loadEthersWhenNeeded();
+            }
         }, 100);
     }, 8000);
+}
+
+async function loadEthersWhenNeeded() {
+    try {
+        await window.loadEthers();
+        ethersLoaded = true;
+        console.log('Ethers.js loaded successfully');
+        
+        // Initialize MetaMask connection
+        if (typeof window.ethereum !== 'undefined') {
+            try {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                checkWalletConnection();
+            } catch (error) {
+                console.warn('Ethers.js initialization error:', error);
+            }
+        } else {
+            showNotification('MetaMask is not installed', 'error');
+        }
+    } catch (error) {
+        console.error('Failed to load ethers.js:', error);
+        showNotification('Failed to load blockchain library', 'error');
+    }
 }
 
 function goToFloppyScreen() {
     mainScreen.classList.remove('active');
     mainScreen.style.opacity = '0';
+    mainScreen.style.transition = 'opacity 2s ease-in-out';
     
     setTimeout(() => {
         mainScreen.style.display = 'none';
         floppyScreen.style.display = 'block';
         floppyScreen.style.opacity = '0';
+        floppyScreen.style.transition = 'opacity 2s ease-in-out';
         
         setTimeout(() => {
             floppyScreen.classList.add('active');
@@ -155,11 +177,13 @@ function goToFloppyScreen() {
 function goToMainScreen() {
     floppyScreen.classList.remove('active');
     floppyScreen.style.opacity = '0';
+    floppyScreen.style.transition = 'opacity 2s ease-in-out';
     
     setTimeout(() => {
         floppyScreen.style.display = 'none';
         mainScreen.style.display = 'block';
         mainScreen.style.opacity = '0';
+        mainScreen.style.transition = 'opacity 2s ease-in-out';
         
         setTimeout(() => {
             mainScreen.classList.add('active');
@@ -183,6 +207,11 @@ function toggleMute() {
 }
 
 async function connectWallet() {
+    if (!ethersLoaded) {
+        showNotification('Loading blockchain library...', 'info');
+        await loadEthersWhenNeeded();
+    }
+    
     if (!window.ethereum) {
         showNotification('MetaMask is not installed', 'error');
         return;
@@ -300,6 +329,10 @@ async function handleBuyFloppy() {
     }
     
     try {
+        if (!ethersLoaded) {
+            await loadEthersWhenNeeded();
+        }
+        
         if (!window.ethers || !window.ethers.utils) {
             showNotification('Ethers.js not loaded properly', 'error');
             return;
