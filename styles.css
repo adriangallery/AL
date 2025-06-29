@@ -56,7 +56,8 @@ body {
     image-rendering: pixelated;
 }
 
-.intro-overlay {
+/* Intro overlay - only visible on intro screen */
+#intro-screen .intro-overlay {
     position: absolute;
     bottom: 20%;
     text-align: center;
