@@ -62,6 +62,7 @@ body {
     bottom: 20%;
     text-align: center;
     z-index: 10;
+    pointer-events: none;
 }
 
 .retro-title {
@@ -122,6 +123,7 @@ body {
     padding: 1rem;
     background: rgba(0, 0, 0, 0.8);
     border-bottom: 2px solid #00ff00;
+    pointer-events: auto;
 }
 
 .logo {
@@ -160,7 +162,7 @@ body {
     font-size: 0.6rem;
 }
 
-/* Área clickeable */
+/* Área clickeable - toda la pantalla */
 .click-area {
     position: absolute;
     top: 0;
@@ -169,6 +171,7 @@ body {
     height: 100%;
     z-index: 5;
     cursor: crosshair;
+    pointer-events: auto;
 }
 
 .pixel-cursor {
@@ -263,6 +266,13 @@ body {
     background: rgba(0, 0, 0, 0.8);
     border-top: 2px solid #00ff00;
     font-size: 0.6rem;
+    pointer-events: auto;
+}
+
+/* Asegurar que los botones del header sean clickeables */
+.retro-header button {
+    pointer-events: auto;
+    z-index: 15;
 }
 
 /* Pantalla de Floppy */
@@ -320,6 +330,12 @@ body {
     color: #ffff00;
     margin-bottom: 1.5rem;
     font-size: 0.8rem;
+}
+
+/* Asegurar que el texto de intro no aparezca en otras pantallas */
+#main-screen .intro-overlay,
+#floppy-screen .intro-overlay {
+    display: none;
 }
 
 /* Responsive */
