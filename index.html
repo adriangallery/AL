@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdrianLAB - Retro Adventure</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Pantalla de intro -->
+        <div id="intro-screen" class="screen active">
+            <img src="intro.png" alt="AdrianLAB Intro" id="intro-image">
+            <div class="intro-overlay">
+                <h1 class="retro-title">AdrianLAB</h1>
+                <p class="retro-subtitle">Click para continuar...</p>
+            </div>
+        </div>
+
+        <!-- Pantalla principal -->
+        <div id="main-screen" class="screen">
+            <div class="background-container">
+                <img src="basement.png" alt="Basement" id="basement-bg">
+            </div>
+            
+            <!-- Header con wallet -->
+            <header class="retro-header">
+                <div class="logo">AdrianLAB</div>
+                <button id="connect-wallet" class="retro-button">Connect Wallet</button>
+                <button id="mute-button" class="retro-button small">🔊</button>
+            </header>
+
+            <!-- Área principal clickeable -->
+            <div id="click-area" class="click-area">
+                <div class="pixel-cursor"></div>
+            </div>
+
+            <!-- Popup de mint -->
+            <div id="mint-popup" class="popup">
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h2>Mint NFT</h2>
+                        <button id="close-popup" class="close-btn">×</button>
+                    </div>
+                    <div class="popup-body">
+                        <p>¿Quieres mintear tu NFT?</p>
+                        <button id="mint-button" class="retro-button">Mint Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="retro-footer">
+                <p>Powered by BASE Network</p>
+            </footer>
+        </div>
+
+        <!-- Pantalla de compra de Floppy -->
+        <div id="floppy-screen" class="screen">
+            <div class="floppy-container">
+                <h1 class="retro-title">Floppy Purchase</h1>
+                <div class="floppy-item">
+                    <div class="floppy-disk"></div>
+                    <h3>Retro Floppy Disk</h3>
+                    <p>Precio: 0.01 ETH</p>
+                    <button id="buy-floppy" class="retro-button">Comprar Floppy</button>
+                </div>
+                <button id="back-to-main" class="retro-button">Volver</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio -->
+    <audio id="background-music" loop>
+        <source src="Retro Adventure.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html> 
