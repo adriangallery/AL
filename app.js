@@ -102,12 +102,24 @@ function startIntro() {
 
 function handleIntroClick() {
     clearTimeout(introTimer);
+    
+    // Initialize and start music on first click
+    if (!musicInitialized) {
+        musicInitialized = true;
+        backgroundMusic.load();
+        if (!isMuted) {
+            backgroundMusic.play().catch(e => console.log('Audio play failed'));
+        }
+    }
+    
     goToMainScreen();
 }
 
 function goToMainScreen() {
-    // Fade out intro
+    // Fade out intro (8 seconds)
     introScreen.style.opacity = '0';
+    introScreen.style.transition = 'opacity 8s ease-in-out';
+    
     setTimeout(() => {
         introScreen.classList.remove('active');
         introScreen.style.display = 'none';
@@ -115,16 +127,13 @@ function goToMainScreen() {
         // Fade in main screen
         mainScreen.style.display = 'block';
         mainScreen.style.opacity = '0';
+        mainScreen.style.transition = 'opacity 2s ease-in-out';
+        
         setTimeout(() => {
             mainScreen.classList.add('active');
             mainScreen.style.opacity = '1';
-            
-            // Start music after user interaction
-            if (!isMuted && musicInitialized) {
-                backgroundMusic.play().catch(e => console.log('Audio autoplay blocked'));
-            }
         }, 100);
-    }, 2000);
+    }, 8000);
 }
 
 function goToFloppyScreen() {
