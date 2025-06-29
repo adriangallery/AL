@@ -76,12 +76,12 @@ function startIntro() {
         introImage.style.opacity = '1';
     }, 100);
     
-    // 10 second timer for auto-transition
+    // 6 second timer for auto-transition (reduced from 10)
     introTimer = setTimeout(() => {
         if (introScreen.classList.contains('active')) {
             handleIntroClick();
         }
-    }, 10000);
+    }, 6000);
 }
 
 function handleIntroClick(event) {
@@ -108,9 +108,9 @@ function handleIntroClick(event) {
 function goToMainScreen() {
     console.log('Starting transition to main screen');
     
-    // Fade out intro (8 seconds)
+    // Fade out intro (4 seconds - reduced from 8)
     introScreen.style.opacity = '0';
-    introScreen.style.transition = 'opacity 8s ease-in-out';
+    introScreen.style.transition = 'opacity 4s ease-in-out';
     
     setTimeout(() => {
         introScreen.classList.remove('active');
@@ -130,7 +130,7 @@ function goToMainScreen() {
                 loadEthersWhenNeeded();
             }
         }, 100);
-    }, 8000);
+    }, 4000);
 }
 
 async function loadEthersWhenNeeded() {

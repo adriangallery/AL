@@ -56,13 +56,24 @@ body {
     image-rendering: pixelated;
 }
 
-/* Intro overlay - only visible on intro screen */
+/* Intro overlay - solo visible en intro screen */
 #intro-screen .intro-overlay {
     position: absolute;
     bottom: 20%;
     text-align: center;
     z-index: 10;
-    pointer-events: none;
+    pointer-events: none; /* No interfiere con el click */
+}
+
+/* Basement overlay - visible en basement */
+.basement-overlay {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 10;
+    pointer-events: none; /* No interfiere con el click */
 }
 
 .retro-title {
