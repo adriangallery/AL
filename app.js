@@ -86,6 +86,12 @@ function startIntro() {
     progressFill.style.width = '0%';
     progressText.textContent = 'LOADING...';
     
+    // Show progress bar
+    const progressContainer = document.querySelector('.progress-container');
+    if (progressContainer) {
+        progressContainer.style.display = 'block';
+    }
+    
     // Fade in intro image
     introImage.style.opacity = '0';
     introImage.style.transition = 'opacity 2s ease-in-out';
@@ -93,7 +99,7 @@ function startIntro() {
     // Start progress bar animation for fade in
     startProgressBar(0, 50, 2000, () => {
         // Progress bar complete for fade in
-        console.log('Fade in progress complete');
+        console.log('Fade in progress complete - 50%');
     });
     
     setTimeout(() => {
@@ -118,6 +124,8 @@ function startProgressBar(startPercent, endPercent, duration, callback) {
         clearInterval(progressInterval);
     }
     
+    console.log(`Starting progress bar: ${startPercent}% to ${endPercent}% over ${duration}ms`);
+    
     progressInterval = setInterval(() => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -125,9 +133,12 @@ function startProgressBar(startPercent, endPercent, duration, callback) {
         const currentWidth = startWidth + (endWidth - startWidth) * progress;
         progressFill.style.width = currentWidth + '%';
         
+        console.log(`Progress: ${currentWidth.toFixed(1)}%`);
+        
         if (progress >= 1) {
             clearInterval(progressInterval);
             progressFill.style.width = endWidth + '%'; // Ensure it reaches exactly 100%
+            console.log(`Progress bar complete: ${endWidth}%`);
             if (callback) callback();
         }
     }, 16); // ~60fps
@@ -158,17 +169,18 @@ function handleIntroClick(event) {
 function goToMainScreen() {
     console.log('Starting transition to main screen');
     
-    // Start progress bar animation for fade out
+    // Start progress bar animation for fade out (from 50% to 100%)
     startProgressBar(50, 100, 5000, () => {
         // Progress bar complete for fade out
         progressText.textContent = 'COMPLETE!';
-        console.log('Fade out progress complete');
+        console.log('Fade out progress complete - 100%');
         
         // Hide progress bar after completion
         setTimeout(() => {
             const progressContainer = document.querySelector('.progress-container');
             if (progressContainer) {
                 progressContainer.style.display = 'none';
+                console.log('Progress bar hidden');
             }
         }, 500);
     });
@@ -180,6 +192,13 @@ function goToMainScreen() {
     setTimeout(() => {
         introScreen.classList.remove('active');
         introScreen.style.display = 'none';
+        
+        // Ensure progress bar is hidden when basement appears
+        const progressContainer = document.querySelector('.progress-container');
+        if (progressContainer) {
+            progressContainer.style.display = 'none';
+            console.log('Progress bar hidden on basement transition');
+        }
         
         // Fade in main screen
         mainScreen.style.display = 'block';
