@@ -84,6 +84,7 @@ function setupEventListeners() {
 function startIntro() {
     // Reset progress bar
     progressFill.style.width = '0%';
+    progressText.textContent = 'LOADING...';
     
     // Fade in intro image
     introImage.style.opacity = '0';
@@ -92,6 +93,7 @@ function startIntro() {
     // Start progress bar animation for fade in
     startProgressBar(0, 50, 2000, () => {
         // Progress bar complete for fade in
+        console.log('Fade in progress complete');
     });
     
     setTimeout(() => {
@@ -111,6 +113,11 @@ function startProgressBar(startPercent, endPercent, duration, callback) {
     const startWidth = startPercent;
     const endWidth = endPercent;
     
+    // Clear any existing interval
+    if (progressInterval) {
+        clearInterval(progressInterval);
+    }
+    
     progressInterval = setInterval(() => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
@@ -120,6 +127,7 @@ function startProgressBar(startPercent, endPercent, duration, callback) {
         
         if (progress >= 1) {
             clearInterval(progressInterval);
+            progressFill.style.width = endWidth + '%'; // Ensure it reaches exactly 100%
             if (callback) callback();
         }
     }, 16); // ~60fps
@@ -154,6 +162,15 @@ function goToMainScreen() {
     startProgressBar(50, 100, 5000, () => {
         // Progress bar complete for fade out
         progressText.textContent = 'COMPLETE!';
+        console.log('Fade out progress complete');
+        
+        // Hide progress bar after completion
+        setTimeout(() => {
+            const progressContainer = document.querySelector('.progress-container');
+            if (progressContainer) {
+                progressContainer.style.display = 'none';
+            }
+        }, 500);
     });
     
     // Fade out intro (5 seconds - changed from 4)

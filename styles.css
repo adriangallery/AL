@@ -62,7 +62,7 @@ body {
 /* Progress bar pixel art */
 .progress-container {
     position: absolute;
-    top: 50%;
+    top: 70%;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 20;
@@ -402,6 +402,12 @@ body {
 /* Asegurar que el texto de intro no aparezca en otras pantallas */
 #main-screen .intro-overlay,
 #floppy-screen .intro-overlay {
+    display: none;
+}
+
+/* Ocultar progress bar en otras pantallas */
+#main-screen .progress-container,
+#floppy-screen .progress-container {
     display: none;
 }
 
