@@ -24,7 +24,6 @@ const connectWalletBtn = document.getElementById('connect-wallet');
 const clickArea = document.getElementById('click-area');
 const mintPopup = document.getElementById('mint-popup');
 const closePopupBtn = document.getElementById('close-popup');
-const mintButton = document.getElementById('mint-button');
 const buyFloppyBtn = document.getElementById('buy-floppy');
 const backToMainBtn = document.getElementById('back-to-main');
 const progressFill = document.querySelector('.progress-fill');
@@ -70,7 +69,6 @@ function setupEventListeners() {
     // Navigation
     clickArea.addEventListener('click', handleBasementClick);
     closePopupBtn.addEventListener('click', closeMintPopup);
-    mintButton.addEventListener('click', handleMint);
     buyFloppyBtn.addEventListener('click', handleBuyFloppy);
     backToMainBtn.addEventListener('click', goToMainScreen);
     
@@ -403,22 +401,6 @@ function handleBasementClick(event) {
 
 function closeMintPopup() {
     mintPopup.classList.remove('active');
-}
-
-async function handleMint() {
-    if (!isWalletConnected) {
-        showNotification('Connect your wallet first', 'warning');
-        return;
-    }
-    
-    try {
-        showNotification('Mint functionality in development...', 'info');
-        closeMintPopup();
-        // Here would go the mint logic with the contract
-    } catch (error) {
-        console.error('Error in mint:', error);
-        showNotification('Error in mint process', 'error');
-    }
 }
 
 async function handleBuyFloppy() {
