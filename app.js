@@ -11,6 +11,7 @@ let isMuted = false;
 let introTimer;
 let musicInitialized = false;
 let ethersLoaded = false;
+let progressInterval;
 
 // DOM elements
 const introScreen = document.getElementById('intro-screen');
@@ -26,6 +27,8 @@ const closePopupBtn = document.getElementById('close-popup');
 const mintButton = document.getElementById('mint-button');
 const buyFloppyBtn = document.getElementById('buy-floppy');
 const backToMainBtn = document.getElementById('back-to-main');
+const progressFill = document.querySelector('.progress-fill');
+const progressText = document.querySelector('.progress-text');
 
 // Initialization
 document.addEventListener('DOMContentLoaded', function() {
@@ -79,9 +82,17 @@ function setupEventListeners() {
 }
 
 function startIntro() {
+    // Reset progress bar
+    progressFill.style.width = '0%';
+    
     // Fade in intro image
     introImage.style.opacity = '0';
     introImage.style.transition = 'opacity 2s ease-in-out';
+    
+    // Start progress bar animation for fade in
+    startProgressBar(0, 50, 2000, () => {
+        // Progress bar complete for fade in
+    });
     
     setTimeout(() => {
         introImage.style.opacity = '1';
@@ -95,6 +106,25 @@ function startIntro() {
     }, 2000);
 }
 
+function startProgressBar(startPercent, endPercent, duration, callback) {
+    const startTime = Date.now();
+    const startWidth = startPercent;
+    const endWidth = endPercent;
+    
+    progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        const currentWidth = startWidth + (endWidth - startWidth) * progress;
+        progressFill.style.width = currentWidth + '%';
+        
+        if (progress >= 1) {
+            clearInterval(progressInterval);
+            if (callback) callback();
+        }
+    }, 16); // ~60fps
+}
+
 function handleIntroClick(event) {
     if (event) {
         event.preventDefault();
@@ -103,6 +133,7 @@ function handleIntroClick(event) {
     
     console.log('Intro click detected');
     clearTimeout(introTimer);
+    clearInterval(progressInterval);
     
     // Initialize and start music if not already started
     if (!musicInitialized) {
@@ -118,6 +149,12 @@ function handleIntroClick(event) {
 
 function goToMainScreen() {
     console.log('Starting transition to main screen');
+    
+    // Start progress bar animation for fade out
+    startProgressBar(50, 100, 5000, () => {
+        // Progress bar complete for fade out
+        progressText.textContent = 'COMPLETE!';
+    });
     
     // Fade out intro (5 seconds - changed from 4)
     introScreen.style.opacity = '0';
