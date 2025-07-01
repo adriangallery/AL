@@ -100,18 +100,30 @@ function startIntro() {
     startProgressBar(0, 50, 2000, () => {
         // Progress bar complete for fade in
         console.log('Fade in progress complete - 50%');
+        
+        // Automatically continue to 100% after fade in
+        startProgressBar(50, 100, 5000, () => {
+            // Progress bar complete for fade out
+            progressText.textContent = 'COMPLETE!';
+            console.log('Fade out progress complete - 100%');
+            
+            // Hide progress bar after completion
+            setTimeout(() => {
+                const progressContainer = document.querySelector('.progress-container');
+                if (progressContainer) {
+                    progressContainer.style.display = 'none';
+                    console.log('Progress bar hidden');
+                }
+            }, 500);
+        });
+        
+        // Start transition to main screen
+        goToMainScreen();
     });
     
     setTimeout(() => {
         introImage.style.opacity = '1';
     }, 100);
-    
-    // 2 second timer for auto-transition (reduced from 6)
-    introTimer = setTimeout(() => {
-        if (introScreen.classList.contains('active')) {
-            handleIntroClick();
-        }
-    }, 2000);
 }
 
 function startProgressBar(startPercent, endPercent, duration, callback) {
@@ -150,7 +162,7 @@ function handleIntroClick(event) {
         event.stopPropagation();
     }
     
-    console.log('Intro click detected');
+    console.log('Manual intro click detected');
     clearTimeout(introTimer);
     clearInterval(progressInterval);
     
