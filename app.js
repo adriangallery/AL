@@ -163,14 +163,11 @@ function handleIntroClick(event) {
         }
     }
     
-    goToMainScreen();
-}
-
-function goToMainScreen() {
-    console.log('Starting transition to main screen');
+    // Continue progress bar from current position to 100%
+    const currentProgress = parseFloat(progressFill.style.width) || 0;
+    console.log(`Continuing progress from ${currentProgress}% to 100%`);
     
-    // Start progress bar animation for fade out (from 50% to 100%)
-    startProgressBar(50, 100, 5000, () => {
+    startProgressBar(currentProgress, 100, 5000, () => {
         // Progress bar complete for fade out
         progressText.textContent = 'COMPLETE!';
         console.log('Fade out progress complete - 100%');
@@ -184,6 +181,12 @@ function goToMainScreen() {
             }
         }, 500);
     });
+    
+    goToMainScreen();
+}
+
+function goToMainScreen() {
+    console.log('Starting transition to main screen');
     
     // Fade out intro (5 seconds - changed from 4)
     introScreen.style.opacity = '0';
